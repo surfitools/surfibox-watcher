@@ -1,0 +1,16 @@
+{
+  "name": "surfibox-watcher",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Confirms Surfi Box crypto payments around the clock (runs on GitHub Actions).",
+  "type": "module",
+  "scripts": {
+    "start": "node watcher.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}

@@ -1,0 +1,35 @@
+name: Payment watcher
+
+# Every 5 minutes (GitHub's shortest schedule). Each run keeps checking every 30 seconds
+# for about 4.5 minutes, so payments are checked almost continuously, like the VB timer.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+# Never two runs at once; a new run waits for the previous one to finish.
+concurrency:
+  group: payment-watcher
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Check payments
+        run: node watcher.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: https://surfibox-default-rtdb.firebaseio.com
+          RUN_SECONDS: '270'
+          EVERY_SECONDS: '30'
