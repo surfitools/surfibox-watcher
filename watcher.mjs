@@ -352,8 +352,8 @@ const DEFAULT_CONFIRMATIONS = 3;
 const account = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || "{}");
 const url = process.env.FIREBASE_DATABASE_URL;
 if (!account.private_key || !url) {
-	console.error("Set FIREBASE_SERVICE_ACCOUNT and FIREBASE_DATABASE_URL.");
-	process.exit(1);
+	console.log("Surfi Box watcher: FIREBASE_SERVICE_ACCOUNT not set — skipped.");
+	process.exit(0);
 }
 if (process.env.TRONGRID_API_KEY) setTronGridKey(process.env.TRONGRID_API_KEY);
 const app = initializeApp({

@@ -1,5 +1,7 @@
 # Surfi Box payment watcher
 
+> **Two sites, one watcher.** The `watch` job confirms **Surfi Box** payments (secret `FIREBASE_SERVICE_ACCOUNT`, from the *surfibox* Firebase project). The `surfitools` job approves **SurfiTools** payments (secret `SURFITOOLS_SERVICE_ACCOUNT`, from the *surfitools-31a16* project — same steps as below, in that project). A job whose secret is missing is simply skipped. SurfiTools approves automatically only while **Admin → Payments → Approve payments automatically** is on.
+
 Confirms Surfi Box payments around the clock, even when no dashboard is open. It works like the VB timer:
 - every 30 seconds it checks each open payment on the blockchain
 - once the payment has its confirmations (3 by default for BTC, ETH, LTC and DOGE), it marks the payment paid
