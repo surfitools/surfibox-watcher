@@ -30,6 +30,7 @@ jobs:
         run: node watcher.mjs
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          TRONGRID_API_KEY: ${{ secrets.TRONGRID_API_KEY }}
           FIREBASE_DATABASE_URL: https://surfibox-default-rtdb.firebaseio.com
           RUN_SECONDS: '270'
           EVERY_SECONDS: '30'

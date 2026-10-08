@@ -142,7 +142,20 @@ const ASSETS = [
 		uri: (a) => a
 	}
 ];
-const asset = (id) => ASSETS.find((a) => a.id === id);
+const CARD = {
+	id: "CARD",
+	label: "Card",
+	symbol: "USD",
+	network: "card",
+	networkLabel: "Card · Stripe",
+	decimals: 2,
+	color: "#635bff",
+	explorer: (t) => `https://dashboard.stripe.com/payments/${t}`,
+	uri: () => ""
+};
+function asset(id) {
+	return id === "CARD" ? CARD : ASSETS.find((a) => a.id === id);
+}
 /** Fee for a payment: amountCents × feeBps / 100 credits, rounded down (the rules accept exactly this). */
 const feeFor = (amountCents, feeBps) => Math.floor(amountCents * feeBps / 100);
 //#endregion
@@ -173,8 +186,14 @@ function toUnits(amount, decimals) {
 	const f = (frac + "0".repeat(decimals)).slice(0, decimals);
 	return BigInt(whole || "0") * 10n ** BigInt(decimals) + BigInt(f || "0");
 }
+let tronGridKey = String(import.meta.env?.VITE_TRONGRID_KEY ?? "");
+const setTronGridKey = (key) => {
+	tronGridKey = key;
+};
 async function getJson(url) {
-	const res = await fetch(url, { headers: { Accept: "application/json" } });
+	const headers = { Accept: "application/json" };
+	if (tronGridKey && url.startsWith("https://api.trongrid.io/")) headers["TRON-PRO-API-KEY"] = tronGridKey;
+	const res = await fetch(url, { headers });
 	if (!res.ok) throw new Error(`${new URL(url).host} answered ${res.status}`);
 	return await res.json();
 }
@@ -336,6 +355,7 @@ if (!account.private_key || !url) {
 	console.error("Set FIREBASE_SERVICE_ACCOUNT and FIREBASE_DATABASE_URL.");
 	process.exit(1);
 }
+if (process.env.TRONGRID_API_KEY) setTronGridKey(process.env.TRONGRID_API_KEY);
 const app = initializeApp({
 	credential: cert(account),
 	databaseURL: url
@@ -434,7 +454,7 @@ async function tick() {
 			id
 		} : null;
 		const age = inv ? now - inv.createdAt : Infinity;
-		if (!inv || inv.status === "paid" || inv.status === "cancelled" || age > (inv.detectedTxid ? DETECTED_WINDOW : WINDOW)) {
+		if (!inv || inv.asset === "CARD" || inv.status === "paid" || inv.status === "cancelled" || age > (inv.detectedTxid ? DETECTED_WINDOW : WINDOW)) {
 			await db.ref(`open/${uid}/${id}`).remove();
 			continue;
 		}
